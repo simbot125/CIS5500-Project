@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { gapi } from 'gapi-script';
 
-const GoogleLoginButton = () => {
-  const clientId = '594406784673-40nnncocga8lguoufi8agci7378cukft.apps.googleusercontent.com'; // Your Client ID
+const GoogleLoginButton = ({ onLoginSuccess, onLogout }) => {
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const clientId = 'YOUR_CLIENT_ID_HERE'; // Replace with your actual client ID
 
   useEffect(() => {
     function start() {
@@ -11,22 +16,37 @@ const GoogleLoginButton = () => {
         scope: 'profile email',
         plugin_name: "Songify",
       }).then(() => {
-        console.log("Google API client initialized successfully.");
+        const authInstance = gapi.auth2.getAuthInstance();
+        if (authInstance.isSignedIn.get()) {
+          const profile = authInstance.currentUser.get().getBasicProfile();
+          const userData = {
+            id: profile.getId(),
+            name: profile.getName(),
+            imageUrl: profile.getImageUrl(),
+            email: profile.getEmail()
+          };
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+          onLoginSuccess(userData);
+        }
       }).catch(error => {
         console.error("Failed to initialize Google API client:", error);
       });
     }
     gapi.load('client:auth2', start);
-  }, [clientId]);
+  }, [clientId, onLoginSuccess]);
 
   const onSuccess = (res) => {
     const profile = res.getBasicProfile();
-    console.log('Login Success:');
-    console.log('ID: ' + profile.getId());
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail());
-    alert(`Logged in successfully as ${profile.getName()}.`);
+    const userData = {
+      id: profile.getId(),
+      name: profile.getName(),
+      imageUrl: profile.getImageUrl(),
+      email: profile.getEmail()
+    };
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    onLoginSuccess(userData);
   };
 
   const onFailure = (err) => {
@@ -45,19 +65,23 @@ const GoogleLoginButton = () => {
   const handleLogout = () => {
     const authInstance = gapi.auth2.getAuthInstance();
     authInstance.signOut().then(() => {
-      alert('You have been logged out.');
-      console.log('User signed out.');
+      setUser(null);
+      localStorage.removeItem('user');
+      onLogout(); // Notify parent component about the logout
     });
   };
 
   return (
-    <div className="text-center py-4">
-      <button className="btn btn-primary" onClick={handleLogin}>
-        Login with Google
-      </button>
-      <button className="btn btn-danger ms-2" onClick={handleLogout}>
-        Logout
-      </button>
+    <div className="d-flex align-items-center">
+      {user ? (
+        <button className="btn btn-danger btn-sm" onClick={handleLogout}>
+          Logout
+        </button>
+      ) : (
+        <button className="btn btn-primary btn-sm" onClick={handleLogin}>
+          Login with Google
+        </button>
+      )}
     </div>
   );
 };

@@ -1,25 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import LoginRegisterPage from './LoginRegisterPage';
 import UserProfilePage from './UserProfilePage';
+import GoogleLoginButton from './GoogleLoginButton';
 
 const HomePage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem('user');
+  });
+  const [userName, setUserName] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser).name : '';
+  });
 
   const navigate = useNavigate();
 
-  const handleLogin = (userData) => {
+  const handleLogin = (user) => {
     setIsLoggedIn(true);
-    setUser(userData);
+    setUserName(user.name);
     navigate('/');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setUser(null);
+    setUserName('');
+    navigate('/');
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/');
+    }
+  }, [isLoggedIn, navigate]);
 
   return (
     <div>
@@ -48,15 +60,15 @@ const HomePage = () => {
               {isLoggedIn ? (
                 <>
                   <li className="nav-item">
-                    <Link className="nav-link" to="/user-profile">{user.display_name}</Link>
+                    <Link className="nav-link" to="/user-profile">{userName}</Link>
                   </li>
                   <li className="nav-item">
-                    <button className="nav-link btn btn-link" onClick={handleLogout}>Logout</button>
+                    <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
                   </li>
                 </>
               ) : (
                 <li className="nav-item">
-                  <Link className="nav-link btn btn-link" to="/login-register">Login</Link>
+                  <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
                 </li>
               )}
             </ul>
@@ -80,26 +92,22 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="additional-features py-5 bg-light">
+      <section className="additional-features py-5">
         <div className="container">
           <div className="row">
-            <div className="col-md-6 d-flex align-items-stretch">
-              <div className="feature-box bg-white p-4 rounded shadow-sm">
-                <h2 className="display-5">Year in Review</h2>
-                <p className="lead">
-                  Explore the musical profile of a selected year, including the most popular artists and songs.
-                </p>
-                <Link to="/year-in-review" className="btn btn-primary btn-lg mt-4">Explore Year in Review</Link>
-              </div>
+            <div className="col-md-6">
+              <h2 className="display-5">Year in Review</h2>
+              <p className="lead">
+                Explore the musical profile of a selected year, including the most popular artists and songs.
+              </p>
+              <Link to="/year-in-review" className="btn btn-primary btn-lg mt-4">Explore Year in Review</Link>
             </div>
-            <div className="col-md-6 d-flex align-items-stretch">
-              <div className="feature-box bg-white p-4 rounded shadow-sm">
-                <h2 className="display-5">Playlist Recommendations</h2>
-                <p className="lead">
-                  Get personalized playlist recommendations based on your favorite genres and moods.
-                </p>
-                <Link to="/playlist-recommendations" className="btn btn-primary btn-lg mt-4">Get Playlist Recommendations</Link>
-              </div>
+            <div className="col-md-6">
+              <h2 className="display-5">Playlist Recommendations</h2>
+              <p className="lead">
+                Get personalized playlist recommendations based on your favorite genres and moods.
+              </p>
+              <Link to="/playlist-recommendations" className="btn btn-primary btn-lg mt-4">Get Playlist Recommendations</Link>
             </div>
           </div>
         </div>
@@ -125,8 +133,7 @@ const HomePage = () => {
       </footer>
 
       <Routes>
-        <Route path="/login-register" element={<LoginRegisterPage onLogin={handleLogin} />} />
-        <Route path="/user-profile" element={<UserProfilePage userId={user?.user_id} />} />
+        <Route path="/user-profile" element={<UserProfilePage />} />
       </Routes>
     </div>
   );
