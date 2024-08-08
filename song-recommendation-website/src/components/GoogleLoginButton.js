@@ -2,29 +2,35 @@ import React, { useEffect } from 'react';
 import { gapi } from 'gapi-script';
 
 const GoogleLoginButton = () => {
-  const clientId = '594406784673-40nnncocga8lguoufi8agci7378cukft.apps.googleusercontent.com';
+  const clientId = '594406784673-40nnncocga8lguoufi8agci7378cukft.apps.googleusercontent.com'; // Your Client ID
 
   useEffect(() => {
     function start() {
       gapi.client.init({
         clientId: clientId,
         scope: 'profile email',
-        // Optional: set a specific redirect URI if necessary
-        redirect_uri: 'http://localhost:3000', // Ensure this matches Google Cloud settings
+        plugin_name: "Songify",
+      }).then(() => {
+        console.log("Google API client initialized successfully.");
+      }).catch(error => {
+        console.error("Failed to initialize Google API client:", error);
       });
     }
     gapi.load('client:auth2', start);
   }, [clientId]);
 
   const onSuccess = (res) => {
-    console.log('Login Success: currentUser:', res.profileObj);
-    alert(
-      `Logged in successfully as ${res.profileObj.name}. See console for full profile object.`
-    );
+    const profile = res.getBasicProfile();
+    console.log('Login Success:');
+    console.log('ID: ' + profile.getId());
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail());
+    alert(`Logged in successfully as ${profile.getName()}.`);
   };
 
   const onFailure = (err) => {
-    console.error('Login failed: res:', err);
+    console.error('Login failed:', err);
     alert('Failed to login. Please try again.');
   };
 
@@ -32,8 +38,8 @@ const GoogleLoginButton = () => {
     const authInstance = gapi.auth2.getAuthInstance();
     authInstance
       .signIn()
-      .then((res) => onSuccess(res))
-      .catch((err) => onFailure(err));
+      .then(onSuccess)
+      .catch(onFailure);
   };
 
   const handleLogout = () => {
