@@ -3,6 +3,7 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserProfilePage from './UserProfilePage';
 import GoogleLoginButton from './GoogleLoginButton';
+import Register from './Register'; // Import the Register component
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -26,6 +27,13 @@ const HomePage = () => {
     setIsLoggedIn(false);
     setUserName('');
     localStorage.removeItem('user');
+    navigate('/');
+  };
+
+  const handleRegisterSuccess = (user) => {
+    setIsLoggedIn(true);
+    setUserName(user.email);
+    localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
   };
 
@@ -69,9 +77,14 @@ const HomePage = () => {
                   </li>
                 </>
               ) : (
-                <li className="nav-item">
-                  <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
-                </li>
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/register">Register</Link>
+                  </li>
+                  <li className="nav-item">
+                    <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
+                  </li>
+                </>
               )}
             </ul>
           </div>
@@ -144,6 +157,7 @@ const HomePage = () => {
 
       <Routes>
         <Route path="/user-profile" element={<UserProfilePage />} />
+        <Route path="/register" element={<Register onRegisterSuccess={handleRegisterSuccess} />} />
       </Routes>
     </div>
   );

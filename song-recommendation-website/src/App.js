@@ -9,7 +9,7 @@ import YearInReviewPage from './components/YearInReviewPage';
 import PlaylistRecommendationPage from './components/PlaylistRecommendationPage';
 import UserProfilePage from './components/UserProfilePage';
 import FavoritesPage from './components/FavoritesPage';
-
+import Register from './components/Register'; // Import the Register component
 
 const App = () => {
   return (
@@ -25,14 +25,11 @@ const App = () => {
           <Route path="/playlist-recommendation" element={<PlaylistRecommendationPage />} />
           <Route path="/user-profile" element={<UserProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/user-profile" element={<UserProfilePage />} />
+          <Route path="/register" element={<Register />} /> {/* Add Register Route */}
         </Routes>
       </div>
     </Router>
   );
 };
-
-
 
 export default App;
