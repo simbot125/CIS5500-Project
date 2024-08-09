@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import UserProfilePage from './UserProfilePage';
+import UserProfilePage from './UserProfilePage'; // Import the UserProfilePage component
 import GoogleLoginButton from './GoogleLoginButton';
 
 const HomePage = () => {
@@ -10,20 +10,40 @@ const HomePage = () => {
   });
   const [userName, setUserName] = useState(() => {
     const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser).name : '';
+    return storedUser ? JSON.parse(storedUser).username : '';
   });
 
   const navigate = useNavigate();
 
-  const handleLogin = (user) => {
-    setIsLoggedIn(true);
-    setUserName(user.name);
-    navigate('/');
+  const handleLogin = async (user) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/add-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: user.email, username: user.name }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsLoggedIn(true);
+        setUserName(data.user.username);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/');
+      } else {
+        console.error('Failed to add user:', data.message);
+      }
+    } catch (error) {
+      console.error('Error adding user:', error);
+    }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserName('');
+    localStorage.removeItem('user');
     navigate('/');
   };
 
@@ -60,7 +80,7 @@ const HomePage = () => {
               {isLoggedIn ? (
                 <>
                   <li className="nav-item">
-                    <Link className="nav-link" to="/user-profile">{userName}</Link>
+                    <Link className="nav-link" to="/user-profile">{userName}</Link> {/* Link to the user profile page */}
                   </li>
                   <li className="nav-item">
                     <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />

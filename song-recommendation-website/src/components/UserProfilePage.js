@@ -1,136 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import '../UserProfilePage.css';
 
 const UserProfilePage = () => {
-  const { username } = useParams();
   const [user, setUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editUsername, setEditUsername] = useState('');
-  const [editBio, setEditBio] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      if (userData.username === username) {
-        setUser(userData);
-        setEditUsername(userData.username);
-        setEditBio(userData.bio || '');
-      }
-    } else {
-      // Ensure user exists in the backend, create if necessary
-      fetch('/api/ensure-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email: `${username}@example.com`, bio: '' }),
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to ensure user');
-          }
-          return response.json();
-        })
-        .then(data => {
-          setUser(data);
-          setEditUsername(data.username);
-          setEditBio(data.bio || '');
-          localStorage.setItem('user', JSON.stringify(data));
-        })
-        .catch(error => console.error('Error ensuring user:', error));
+      setUser(JSON.parse(storedUser));
     }
-  }, [username]);
+    setLoading(false); // Set loading to false after retrieving user data
+  }, []);
 
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-  };
-
-  const handleSave = () => {
-    const updatedUser = {
-      username: editUsername,
-      email: user.email,
-      bio: editBio,
-    };
-
-    fetch(`/api/users/${user.email}`, {  // Use email as the identifier here
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        newUsername: editUsername,
-        bio: editBio,
-      }),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to update profile');
-        }
-        return response.text();
-      })
-      .then(data => {
-        console.log(data);
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setIsEditing(false);
-      })
-      .catch(error => {
-        console.error('Error updating profile:', error);
-        alert('There was an issue updating your profile.');
-      });
-  };
+  if (loading) {
+    return <div className="text-center mt-5">Loading...</div>; // Display loading indicator centered on the page
+  }
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className="text-center mt-5">No user data found. Please log in.</div>; // Handle case where user data is missing
   }
 
   return (
-    <div className="user-profile-container">
-      <h2>User Profile</h2>
-      <div className="card">
-        <div className="card-body">
-          {isEditing ? (
-            <>
-              <div className="form-group">
-                <label>Username:</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={editUsername}
-                  onChange={e => setEditUsername(e.target.value)}
+    <div className="container mt-5">
+      <div className="row">
+        <div className="col-md-4 text-center">
+          <div className="card">
+            <div className="card-body">
+              <h3 className="card-title">Profile Picture</h3>
+              {/* Placeholder for profile picture */}
+              <div className="mb-4">
+                <img
+                  src="https://via.placeholder.com/150"
+                  alt="User Avatar"
+                  className="rounded-circle img-fluid"
                 />
               </div>
-              <div className="form-group">
-                <label>Bio:</label>
-                <textarea
-                  className="form-control"
-                  value={editBio}
-                  onChange={e => setEditBio(e.target.value)}
-                />
-              </div>
-              <button className="btn btn-success" onClick={handleSave}>
-                Save
-              </button>
-              <button className="btn btn-secondary" onClick={handleEditToggle}>
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <h3 className="card-title">{user.username}</h3>
-              <p className="card-text"><strong>Email:</strong> {user.email}</p>
-              <p className="card-text"><strong>Bio:</strong> {user.bio || 'No bio available.'}</p>
-              <button className="btn btn-primary" onClick={handleEditToggle}>
-                Edit Profile
-              </button>
-            </>
-          )}
+              <h4 className="card-title">{user.username}</h4>
+              <p className="text-muted">{user.email}</p>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="mt-4 text-center">
-        <Link to="/" className="btn btn-link">Back to Home</Link>
+        <div className="col-md-8">
+          <div className="card">
+            <div className="card-body">
+              <h3 className="card-title">User Information</h3>
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item">
+                  <strong>Username: </strong>{user.username}
+                </li>
+                <li className="list-group-item">
+                  <strong>Email: </strong>{user.email}
+                </li>
+                <li className="list-group-item">
+                  <strong>Bio: </strong>{user.bio || 'No bio available'}
+                </li>
+              </ul>
+              {/* Additional User Information can be added here */}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -47,75 +47,6 @@ app.get('/spotify_data', (req, res) => {
   });
 });
 
-// Route to check if a user exists and create if not
-app.post('/api/register', async (req, res) => {
-  const { username, email, password, bio } = req.body;
-
-  // Check if the user already exists by email
-  const checkUserQuery = 'SELECT * FROM Users WHERE email = ?';
-  connection.query(checkUserQuery, [email], async (err, results) => {
-    if (err) {
-      console.error('Error checking if user exists:', err.stack);
-      return res.status(500).json({ error: 'An error occurred while checking if user exists' });
-    }
-
-    if (results.length > 0) {
-      return res.status(409).json({ message: 'User already exists' });
-    }
-
-    // If user does not exist, hash the password and insert new user
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const insertUserQuery = 'INSERT INTO Users (username, email, password_hash, bio) VALUES (?, ?, ?, ?)';
-      connection.query(insertUserQuery, [username, email, hashedPassword, bio], (err, result) => {
-        if (err) {
-          console.error('Error creating user:', err.stack);
-          return res.status(500).json({ error: 'An error occurred while creating the user' });
-        }
-        res.status(201).json({ message: 'User created successfully' });
-      });
-    } catch (error) {
-      console.error('Error hashing password:', error.stack);
-      res.status(500).json({ error: 'An error occurred while creating the user' });
-    }
-  });
-});
-
-app.post('/api/ensure-user', (req, res) => {
-  const { username, email, bio } = req.body;
-
-  const checkUserQuery = 'SELECT * FROM Users WHERE email = ?';
-  connection.query(checkUserQuery, [email], (err, results) => {
-    if (err) {
-      console.error('Error checking if user exists:', err.stack);
-      return res.status(500).json({ error: 'An error occurred while checking if user exists' });
-    }
-
-    if (results.length > 0) {
-      // User already exists, return the existing user
-      return res.status(200).json(results[0]);
-    }
-
-    // If user does not exist, create the user
-    const createUserQuery = 'INSERT INTO Users (username, email, bio) VALUES (?, ?, ?)';
-    connection.query(createUserQuery, [username, email, bio], (err, result) => {
-      if (err) {
-        console.error('Error creating user:', err.stack);
-        return res.status(500).json({ error: 'An error occurred while creating the user' });
-      }
-
-      const newUser = {
-        username,
-        email,
-        bio,
-      };
-      res.status(201).json(newUser);
-    });
-  });
-});
-
-
-// Route to update a user profile
 app.put('/api/users/:username', (req, res) => {
   const { username } = req.params;
   const { newUsername, bio } = req.body;
@@ -138,34 +69,37 @@ app.put('/api/users/:username', (req, res) => {
   });
 });
 
+// Add user to database after Google login
+app.post('/api/add-user', async (req, res) => {
+  const { email, username } = req.body;
 
-
-app.post('/api/google-login', (req, res) => {
-  const { email, username, bio } = req.body;
-
-  // Check if the user already exists
-  const checkUserQuery = 'SELECT * FROM Users WHERE email = ?';
-  connection.query(checkUserQuery, [email], (err, results) => {
-    if (err) {
-      console.error('Error checking if user exists:', err.stack);
-      return res.status(500).json({ error: 'An error occurred while checking if user exists' });
-    }
-
-    if (results.length > 0) {
-      // User already exists, return success
-      return res.status(200).json({ message: 'User already exists' });
-    }
-
-    // If user does not exist, insert new user
-    const insertUserQuery = 'INSERT INTO Users (username, email, bio) VALUES (?, ?, ?)';
-    connection.query(insertUserQuery, [username || null, email, bio || null], (err, result) => {
+  try {
+    connection.query('SELECT * FROM Users WHERE email = ?', [email], (err, results) => {
       if (err) {
-        console.error('Error inserting user:', err.stack);
-        return res.status(500).json({ error: 'An error occurred while creating the user' });
+        console.error('Error executing query:', err.stack);
+        return res.status(500).send('Error checking user');
       }
-      res.status(201).json({ message: 'User created successfully' });
+
+      if (results.length > 0) {
+        console.log('User already exists:', results[0]);
+        res.status(200).send({ message: 'User already exists', user: results[0] });
+      } else {
+        const passwordHash = bcrypt.hashSync(email + 'SOME_FIXED_SALT', 10);  // Simple example hash
+        const query = 'INSERT INTO Users (username, email, password_hash, bio) VALUES (?, ?, ?, ?)';
+        connection.query(query, [username, email, passwordHash, ''], (err, result) => {
+          if (err) {
+            console.error('Error inserting user:', err.stack);
+            return res.status(500).send('Error creating user');
+          }
+          console.log('New user created:', { username, email, bio: '' });
+          res.status(201).send({ message: 'User created', user: { username, email, bio: '' } });
+        });
+      }
     });
-  });
+  } catch (error) {
+    console.error('Error processing user:', error);
+    res.status(500).send('Server error');
+  }
 });
 
 app.listen(port, () => {
