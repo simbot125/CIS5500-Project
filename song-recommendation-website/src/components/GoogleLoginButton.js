@@ -7,7 +7,7 @@ const GoogleLoginButton = ({ onLoginSuccess, onLogout }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  const clientId = 'YOUR_CLIENT_ID_HERE'; // Replace with your actual client ID
+  const clientId = '594406784673-40nnncocga8lguoufi8agci7378cukft.apps.googleusercontent.com';
 
   useEffect(() => {
     function start() {
@@ -87,3 +87,13 @@ const GoogleLoginButton = ({ onLoginSuccess, onLogout }) => {
 };
 
 export default GoogleLoginButton;
+
+
+
+
+
+
+
+
+
+const clientId = '594406784673-40nnncocga8lguoufi8agci7378cukft.apps.googleusercontent.com';

@@ -29,11 +29,14 @@ const App = () => {
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/login-register" element={<LoginRegisterPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/help-faq-contact" element={<HelpFaqContactPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/user-profile" element={<UserProfilePage />} />
         </Routes>
       </div>
     </Router>
   );
 };
+
+
 
 export default App;
