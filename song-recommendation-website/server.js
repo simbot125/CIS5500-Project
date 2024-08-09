@@ -120,6 +120,41 @@ app.post('/api/add-user', async (req, res) => {
   }
 });
 
+app.post('/api/register', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if user already exists
+    connection.query('SELECT * FROM Users WHERE email = ?', [email], (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err.stack);
+        return res.status(500).send({ message: 'Error checking user' });
+      }
+
+      if (results.length > 0) {
+        return res.status(400).send({ message: 'User already exists' });
+      }
+
+      // Hash the password
+      const passwordHash = bcrypt.hashSync(password, 10);
+
+      // Insert the new user
+      const query = 'INSERT INTO Users (email, password_hash) VALUES (?, ?)';
+      connection.query(query, [email, passwordHash], (err, result) => {
+        if (err) {
+          console.error('Error inserting user:', err.stack);
+          return res.status(500).send({ message: 'Error creating user' });
+        }
+        console.log('New user created:', { email });
+        res.status(201).send({ message: 'User created', user: { email } });
+      });
+    });
+  } catch (error) {
+    console.error('Error processing registration:', error);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

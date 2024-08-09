@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import UserProfilePage from './UserProfilePage'; // Import the UserProfilePage component
+import UserProfilePage from './UserProfilePage';
 import GoogleLoginButton from './GoogleLoginButton';
 
 const HomePage = () => {
@@ -15,29 +15,11 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = async (user) => {
-    try {
-      const response = await fetch('http://localhost:3001/api/add-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: user.email, username: user.name }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setIsLoggedIn(true);
-        setUserName(data.user.username);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/');
-      } else {
-        console.error('Failed to add user:', data.message);
-      }
-    } catch (error) {
-      console.error('Error adding user:', error);
-    }
+  const handleLogin = (user) => {
+    setIsLoggedIn(true);
+    setUserName(user.name);
+    localStorage.setItem('user', JSON.stringify(user));
+    navigate('/');
   };
 
   const handleLogout = () => {
@@ -73,14 +55,14 @@ const HomePage = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul className="navbar-nav">
+            <ul className="navbar-nav align-items-center">
               <li className="nav-item">
                 <Link className="nav-link active" aria-current="page" to="/">Home</Link>
               </li>
               {isLoggedIn ? (
                 <>
                   <li className="nav-item">
-                    <Link className="nav-link" to="/user-profile">{userName}</Link> {/* Link to the user profile page */}
+                    <Link className="nav-link" to="/user-profile">{userName}</Link>
                   </li>
                   <li className="nav-item">
                     <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
@@ -115,19 +97,27 @@ const HomePage = () => {
       <section className="additional-features py-5">
         <div className="container">
           <div className="row">
-            <div className="col-md-6">
-              <h2 className="display-5">Year in Review</h2>
-              <p className="lead">
-                Explore the musical profile of a selected year, including the most popular artists and songs.
-              </p>
-              <Link to="/year-in-review" className="btn btn-primary btn-lg mt-4">Explore Year in Review</Link>
+            <div className="col-md-6 d-flex align-items-stretch mb-4">
+              <div className="card w-100">
+                <div className="card-body d-flex flex-column">
+                  <h2 className="card-title display-5">Year in Review</h2>
+                  <p className="card-text lead flex-grow-1">
+                    Explore the musical profile of a selected year, including the most popular artists and songs.
+                  </p>
+                  <Link to="/year-in-review" className="btn btn-primary mt-auto align-self-start">Explore Year in Review</Link>
+                </div>
+              </div>
             </div>
-            <div className="col-md-6">
-              <h2 className="display-5">Playlist Recommendations</h2>
-              <p className="lead">
-                Get personalized playlist recommendations based on your favorite genres and moods.
-              </p>
-              <Link to="/playlist-recommendations" className="btn btn-primary btn-lg mt-4">Get Playlist Recommendations</Link>
+            <div className="col-md-6 d-flex align-items-stretch mb-4">
+              <div className="card w-100">
+                <div className="card-body d-flex flex-column">
+                  <h2 className="card-title display-5">Playlist Recommendations</h2>
+                  <p className="card-text lead flex-grow-1">
+                    Get personalized playlist recommendations based on your favorite genres and moods.
+                  </p>
+                  <Link to="/playlist-recommendations" className="btn btn-primary mt-auto align-self-start">Get Playlist Recommendations</Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

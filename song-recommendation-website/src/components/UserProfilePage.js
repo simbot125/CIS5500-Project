@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const UserProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -6,6 +7,7 @@ const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -26,7 +28,6 @@ const UserProfilePage = () => {
     if (!user) return;
   
     try {
-      console.log('Sending update request:', { newUsername: username, bio });
       const response = await fetch(`http://localhost:3001/api/users/${user.email}`, {
         method: 'PUT',
         headers: {
@@ -40,15 +41,17 @@ const UserProfilePage = () => {
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setIsEditing(false); 
-        console.log('User information updated successfully');
       } else {
-        console.error('Failed to update user information:', response.statusText);
+        console.error('Failed to update user information.');
       }
     } catch (error) {
       console.error('Error updating user information:', error);
     }
   };
-  
+
+  const handleGoHome = () => {
+    navigate('/'); // Navigate to the homepage
+  };
 
   if (loading) {
     return <div className="text-center mt-5">Loading...</div>; // Display loading indicator centered on the page
@@ -74,6 +77,7 @@ const UserProfilePage = () => {
               </div>
               <h4 className="card-title">{user.username}</h4>
               <p className="text-muted">{user.email}</p>
+              <button className="btn btn-primary mt-3" onClick={handleGoHome}>Home</button> {/* Home Button */}
             </div>
           </div>
         </div>
