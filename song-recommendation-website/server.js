@@ -47,17 +47,20 @@ app.get('/spotify_data', (req, res) => {
   });
 });
 
-app.put('/api/users/:username', (req, res) => {
-  const { username } = req.params;
+app.put('/api/users/:email', (req, res) => {
+  console.log('Received update request for email:', req.params.email);
+  console.log('Update data:', req.body);
+
+  const { email } = req.params;
   const { newUsername, bio } = req.body;
 
   const query = `
     UPDATE Users
     SET username = ?, bio = ?
-    WHERE username = ?
+    WHERE email = ?
   `;
 
-  connection.query(query, [newUsername, bio, username], (err, result) => {
+  connection.query(query, [newUsername, bio, email], (err, result) => {
     if (err) {
       console.error('Error updating user profile:', err.stack);
       return res.status(500).send('Server error');
@@ -69,11 +72,11 @@ app.put('/api/users/:username', (req, res) => {
   });
 });
 
-// Add user to database after Google login
 app.post('/api/add-user', async (req, res) => {
   const { email, username } = req.body;
 
   try {
+    // Check if user already exists based on email
     connection.query('SELECT * FROM Users WHERE email = ?', [email], (err, results) => {
       if (err) {
         console.error('Error executing query:', err.stack);
@@ -82,19 +85,34 @@ app.post('/api/add-user', async (req, res) => {
 
       if (results.length > 0) {
         console.log('User already exists:', results[0]);
-        res.status(200).send({ message: 'User already exists', user: results[0] });
-      } else {
-        const passwordHash = bcrypt.hashSync(email + 'SOME_FIXED_SALT', 10);  // Simple example hash
+        return res.status(200).send({ message: 'User already exists', user: results[0] });
+      }
+
+      // Check if username is unique
+      connection.query('SELECT * FROM Users WHERE username = ?', [username], (err, results) => {
+        if (err) {
+          console.error('Error checking username:', err.stack);
+          return res.status(500).send('Error checking username');
+        }
+
+        let newUsername = username;
+        if (results.length > 0) {
+          // If username is taken, append a number or create a unique username
+          newUsername = `${username}_${Date.now()}`;
+        }
+
+        // Insert new user
+        const passwordHash = bcrypt.hashSync(email + 'SOME_FIXED_SALT', 10);
         const query = 'INSERT INTO Users (username, email, password_hash, bio) VALUES (?, ?, ?, ?)';
-        connection.query(query, [username, email, passwordHash, ''], (err, result) => {
+        connection.query(query, [newUsername, email, passwordHash, ''], (err, result) => {
           if (err) {
             console.error('Error inserting user:', err.stack);
             return res.status(500).send('Error creating user');
           }
-          console.log('New user created:', { username, email, bio: '' });
-          res.status(201).send({ message: 'User created', user: { username, email, bio: '' } });
+          console.log('New user created:', { username: newUsername, email, bio: '' });
+          res.status(201).send({ message: 'User created', user: { username: newUsername, email, bio: '' } });
         });
-      }
+      });
     });
   } catch (error) {
     console.error('Error processing user:', error);
