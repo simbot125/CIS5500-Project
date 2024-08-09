@@ -9,9 +9,7 @@ import YearInReviewPage from './components/YearInReviewPage';
 import PlaylistRecommendationPage from './components/PlaylistRecommendationPage';
 import UserProfilePage from './components/UserProfilePage';
 import FavoritesPage from './components/FavoritesPage';
-import LoginRegisterPage from './components/LoginRegisterPage';
-import SettingsPage from './components/SettingsPage';
-import HelpFaqContactPage from './components/HelpFaqContactPage';
+
 
 const App = () => {
   return (
@@ -27,8 +25,6 @@ const App = () => {
           <Route path="/playlist-recommendation" element={<PlaylistRecommendationPage />} />
           <Route path="/user-profile" element={<UserProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/login-register" element={<LoginRegisterPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/user-profile" element={<UserProfilePage />} />
         </Routes>
