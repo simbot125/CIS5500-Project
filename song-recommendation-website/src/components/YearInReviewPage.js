@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Layout from './Layout'; // Import the Layout component
 
 const YearInReviewPage = () => {
   const [year, setYear] = useState('');
@@ -14,27 +15,29 @@ const YearInReviewPage = () => {
   }, [year]);
 
   return (
-    <div className="container my-5">
-      <h2>Year in Review</h2>
-      <input
-        type="number"
-        className="form-control"
-        placeholder="Enter a year"
-        value={year}
-        onChange={e => setYear(e.target.value)}
-      />
-      {yearData && (
-        <>
-          <h3>Year: {year}</h3>
-          <p>Most Popular Song: {yearData.most_popular_song}</p>
-          <p>Most Popular Artist: {yearData.most_popular_artist}</p>
-          <p>Valence: {yearData.valence}</p>
-          <p>Tempo: {yearData.tempo}</p>
-          <p>Key: {yearData.key}</p>
-          <p>Danceability: {yearData.danceability}</p>
-        </>
-      )}
-    </div>
+    <Layout>
+      <div className="container my-5">
+        <h2>Year in Review</h2>
+        <input
+          type="number"
+          className="form-control"
+          placeholder="Enter a year"
+          value={year}
+          onChange={e => setYear(e.target.value)}
+        />
+        {yearData && (
+          <>
+            <h3 className="mt-4">Year: {year}</h3>
+            <p><strong>Most Popular Song:</strong> {yearData.most_popular_song}</p>
+            <p><strong>Most Popular Artist:</strong> {yearData.most_popular_artist}</p>
+            <p><strong>Valence:</strong> {yearData.valence}</p>
+            <p><strong>Tempo:</strong> {yearData.tempo}</p>
+            <p><strong>Key:</strong> {yearData.key}</p>
+            <p><strong>Danceability:</strong> {yearData.danceability}</p>
+          </>
+        )}
+      </div>
+    </Layout>
   );
 };
 
