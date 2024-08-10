@@ -155,6 +155,36 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    connection.query('SELECT * FROM Users WHERE email = ?', [email], (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err.stack);
+        return res.status(500).send({ message: 'Error checking user' });
+      }
+
+      if (results.length === 0) {
+        return res.status(400).send({ message: 'User not found' });
+      }
+
+      const user = results[0];
+
+      // Compare the hashed password
+      if (!bcrypt.compareSync(password, user.password_hash)) {
+        return res.status(400).send({ message: 'Invalid credentials' });
+      }
+
+      // If successful, return user data
+      res.status(200).send({ message: 'Login successful', user: { email: user.email, username: user.username } });
+    });
+  } catch (error) {
+    console.error('Error processing login:', error);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

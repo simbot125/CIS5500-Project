@@ -16,13 +16,15 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
+  // Function to handle login success
   const handleLogin = (user) => {
     setIsLoggedIn(true);
-    setUserName(user.name);
+    setUserName(user.username);
     localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
   };
 
+  // Function to handle logout
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserName('');
@@ -30,9 +32,10 @@ const HomePage = () => {
     navigate('/');
   };
 
+  // Function to handle registration success
   const handleRegisterSuccess = (user) => {
     setIsLoggedIn(true);
-    setUserName(user.email);
+    setUserName(user.username);
     localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
   };
@@ -79,7 +82,7 @@ const HomePage = () => {
               ) : (
                 <>
                   <li className="nav-item">
-                    <Link className="nav-link" to="/register">Register</Link>
+                    <Link className="nav-link" to="/register">Login/Register</Link> {/* Login/Register Link */}
                   </li>
                   <li className="nav-item">
                     <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
@@ -157,7 +160,7 @@ const HomePage = () => {
 
       <Routes>
         <Route path="/user-profile" element={<UserProfilePage />} />
-        <Route path="/register" element={<Register onRegisterSuccess={handleRegisterSuccess} />} />
+        <Route path="/register" element={<Register onLoginSuccess={handleLogin} onRegisterSuccess={handleRegisterSuccess} />} />
       </Routes>
     </div>
   );
