@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Register = ({ onLoginSuccess, onRegisterSuccess }) => {
+const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isRegistering, setIsRegistering] = useState(true); // Toggle between login and register
+  const [isRegistering, setIsRegistering] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
@@ -27,20 +27,17 @@ const Register = ({ onLoginSuccess, onRegisterSuccess }) => {
 
       if (response.ok) {
         setSuccess('Registration successful!');
-        setError(null); // Clear error
-        onRegisterSuccess(data.user);
+        setError(null);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Save user data to localStorage
         navigate('/'); // Redirect to home after successful registration
       } else {
         setError(data.message || 'Registration failed');
-        setSuccess(null); // Clear success
+        setSuccess(null);
       }
     } catch (error) {
-      console.error('Registration error:', error); // Log the error to the console
-      if (error instanceof Error) {
-        console.error('Registration error message:', error.message);
-      }
+      console.error('Registration error:', error);
       setError(`An error occurred during registration: ${error.message || 'Unknown error'}`);
-      setSuccess(null); // Clear success
+      setSuccess(null);
     }
   };
 
@@ -62,20 +59,17 @@ const Register = ({ onLoginSuccess, onRegisterSuccess }) => {
 
       if (response.ok) {
         setSuccess('Login successful!');
-        setError(null); // Clear error
-        onLoginSuccess(data.user);
+        setError(null);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Save user data to localStorage
         navigate('/'); // Redirect to home after successful login
       } else {
         setError(data.message || 'Login failed');
-        setSuccess(null); // Clear success
+        setSuccess(null);
       }
     } catch (error) {
-      console.error('Login error:', error); // Log the error to the console
-      if (error instanceof Error) {
-        console.error('Login error message:', error.message);
-      }
+      console.error('Login error:', error);
       setError(`An error occurred during login: ${error.message || 'Unknown error'}`);
-      setSuccess(null); // Clear success
+      setSuccess(null);
     }
   };
 

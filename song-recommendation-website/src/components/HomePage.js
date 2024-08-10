@@ -16,15 +16,13 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  // Function to handle login success
   const handleLogin = (user) => {
     setIsLoggedIn(true);
-    setUserName(user.username);
+    setUserName(user.name);
     localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
   };
 
-  // Function to handle logout
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserName('');
@@ -32,10 +30,9 @@ const HomePage = () => {
     navigate('/');
   };
 
-  // Function to handle registration success
   const handleRegisterSuccess = (user) => {
     setIsLoggedIn(true);
-    setUserName(user.username);
+    setUserName(user.email);
     localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
   };
