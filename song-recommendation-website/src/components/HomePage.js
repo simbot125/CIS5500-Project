@@ -128,7 +128,7 @@ const HomePage = () => {
                   <p className="card-text lead flex-grow-1">
                     Get personalized playlist recommendations based on your favorite genres and moods.
                   </p>
-                  <Link to="/playlist-recommendations" className="btn btn-primary mt-auto align-self-start">Get Playlist Recommendations</Link>
+                  <Link to="/playlist-recommendation" className="btn btn-primary mt-auto align-self-start">Get Playlist Recommendations</Link>
                 </div>
               </div>
             </div>
