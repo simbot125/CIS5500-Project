@@ -11,7 +11,6 @@ const FavoritesPage = () => {
   }, []);
 
   const handleRemoveFavorite = (songId) => {
-    // Implement remove favorite logic here
   };
 
   return (

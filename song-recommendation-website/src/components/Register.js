@@ -28,8 +28,8 @@ const Register = () => {
       if (response.ok) {
         setSuccess('Registration successful!');
         setError(null);
-        localStorage.setItem('user', JSON.stringify(data.user)); // Save user data to localStorage
-        navigate('/'); // Redirect to home after successful registration
+        localStorage.setItem('user', JSON.stringify(data.user)); 
+        navigate('/'); 
       } else {
         setError(data.message || 'Registration failed');
         setSuccess(null);
@@ -60,8 +60,8 @@ const Register = () => {
       if (response.ok) {
         setSuccess('Login successful!');
         setError(null);
-        localStorage.setItem('user', JSON.stringify(data.user)); // Save user data to localStorage
-        navigate('/'); // Redirect to home after successful login
+        localStorage.setItem('user', JSON.stringify(data.user)); 
+        navigate('/');
       } else {
         setError(data.message || 'Login failed');
         setSuccess(null);

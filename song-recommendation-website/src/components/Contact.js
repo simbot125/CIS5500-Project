@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../Contact.css'; // Adjust the path to point to the css file
+import '../Contact.css'; 
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +18,6 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Implement form submission logic here
     alert('Message sent!');
     setFormData({
       name: '',

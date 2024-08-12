@@ -67,7 +67,7 @@ const GoogleLoginButton = ({ onLoginSuccess, onLogout }) => {
     authInstance.signOut().then(() => {
       setUser(null);
       localStorage.removeItem('user');
-      onLogout(); // Notify parent component about the logout
+      onLogout(); 
     });
   };
 

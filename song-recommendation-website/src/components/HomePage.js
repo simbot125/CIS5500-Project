@@ -3,7 +3,8 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserProfilePage from './UserProfilePage';
 import GoogleLoginButton from './GoogleLoginButton';
-import Register from './Register'; // Import the Register component
+import Register from './Register';
+import SearchResultsPage from './SearchResultsPage';
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -13,6 +14,7 @@ const HomePage = () => {
     const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser).username : '';
   });
+  const [searchQuery, setSearchQuery] = useState(''); 
 
   const navigate = useNavigate();
 
@@ -35,6 +37,11 @@ const HomePage = () => {
     setUserName(user.email);
     localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/search?q=${searchQuery}`);
   };
 
   useEffect(() => {
@@ -79,7 +86,7 @@ const HomePage = () => {
               ) : (
                 <>
                   <li className="nav-item">
-                    <Link className="nav-link" to="/register">Login/Register</Link> {/* Login/Register Link */}
+                    <Link className="nav-link" to="/register">Login/Register</Link>
                   </li>
                   <li className="nav-item">
                     <GoogleLoginButton onLoginSuccess={handleLogin} onLogout={handleLogout} />
@@ -102,8 +109,16 @@ const HomePage = () => {
           <p className="lead">
             Explore trending tracks and get personalized song recommendations based on your taste.
           </p>
-          <input type="text" className="form-control" placeholder="Search for a song or artist" />
-          <button className="btn btn-primary btn-lg mt-4">Search</button>
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search for a song or artist"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="btn btn-primary btn-lg mt-4">Search</button>
+          </form>
         </div>
       </section>
 
@@ -158,6 +173,7 @@ const HomePage = () => {
       <Routes>
         <Route path="/user-profile" element={<UserProfilePage />} />
         <Route path="/register" element={<Register onLoginSuccess={handleLogin} onRegisterSuccess={handleRegisterSuccess} />} />
+        <Route path="/search" element={<SearchResultsPage />} /> {/* Add Search Results Route */}
       </Routes>
     </div>
   );

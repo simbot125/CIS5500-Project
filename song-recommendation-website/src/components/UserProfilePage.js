@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 const UserProfilePage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+  const [isEditing, setIsEditing] = useState(false); 
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -17,7 +17,7 @@ const UserProfilePage = () => {
       setUsername(parsedUser.username);
       setBio(parsedUser.bio);
     }
-    setLoading(false); // Set loading to false after retrieving user data
+    setLoading(false); 
   }, []);
 
   const handleEditToggle = () => {
@@ -50,15 +50,15 @@ const UserProfilePage = () => {
   };
 
   const handleGoHome = () => {
-    navigate('/'); // Navigate to the homepage
+    navigate('/');
   };
 
   if (loading) {
-    return <div className="text-center mt-5">Loading...</div>; // Display loading indicator centered on the page
+    return <div className="text-center mt-5">Loading...</div>; 
   }
 
   if (!user) {
-    return <div className="text-center mt-5">No user data found. Please log in.</div>; // Handle case where user data is missing
+    return <div className="text-center mt-5">No user data found. Please log in.</div>; 
   }
 
   return (

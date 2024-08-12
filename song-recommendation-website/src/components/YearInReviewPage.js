@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Layout from './Layout'; // Import the Layout component
+import Layout from './Layout'; 
 
 const YearInReviewPage = () => {
   const [year, setYear] = useState('');

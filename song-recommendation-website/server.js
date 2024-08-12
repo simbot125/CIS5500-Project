@@ -191,7 +191,6 @@ app.get('/year/:year', (req, res) => {
   const billboardQuery = 'SELECT * FROM billboard_data WHERE YEAR(date) = ?';
   const spotifyQuery = 'SELECT * FROM spotify_data WHERE YEAR(track_album_release_date) = ?';
 
-  // Query both tables
   connection.query(billboardQuery, [year], (billboardErr, billboardResults) => {
     if (billboardErr) {
       console.error('Error executing Billboard query:', billboardErr.stack);
@@ -217,6 +216,83 @@ app.get('/year/:year', (req, res) => {
 
       res.json(yearData);
     });
+  });
+});
+
+app.post('/playlists', (req, res) => {
+  const {
+    genre,
+    popularity,
+    popularityFilterType,
+    danceability,
+    danceabilityFilterType,
+    tempo,
+    tempoFilterType
+  } = req.body;
+
+  let query = 'SELECT * FROM spotify_data WHERE 1=1'; 
+
+  const filters = [];
+
+  if (genre) {
+    query += ' AND playlist_genre = ?';
+    filters.push(genre);
+  }
+
+  if (popularity) {
+    if (popularityFilterType === 'exact') {
+      query += ' AND track_popularity = ?';
+    } else {
+      query += ' AND track_popularity >= ?';
+    }
+    filters.push(Number(popularity));
+  }
+
+  if (danceability) {
+    if (danceabilityFilterType === 'exact') {
+      query += ' AND ROUND(danceability, 2) = ROUND(?, 2)';
+    } else {
+      query += ' AND danceability >= ?';
+    }
+    filters.push(Number(danceability));
+  }
+
+  if (tempo) {
+    if (tempoFilterType === 'exact') {
+      query += ' AND ROUND(tempo, 2) = ROUND(?, 2)';
+    } else {
+      query += ' AND tempo >= ?';
+    }
+    filters.push(Number(tempo));
+  }
+
+  console.log('Executing query:', query);
+  console.log('With parameters:', filters);
+
+  connection.query(query, filters, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.stack);
+      return res.status(500).send('Error executing query');
+    }
+    res.json(results);
+  });
+});
+
+app.get('/search', (req, res) => {
+  const query = req.query.q;
+  const searchQuery = `%${query}%`; // Use wildcards for partial matching
+
+  const sql = `
+    SELECT * FROM spotify_data
+    WHERE track_name LIKE ? OR track_artist LIKE ?
+  `;
+
+  connection.query(sql, [searchQuery, searchQuery], (err, results) => {
+    if (err) {
+      console.error('Error executing search query:', err.stack);
+      return res.status(500).send('Error executing search query');
+    }
+    res.json(results); // Send the results as JSON
   });
 });
 
