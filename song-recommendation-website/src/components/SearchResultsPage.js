@@ -13,7 +13,8 @@ const SearchResultsPage = () => {
       fetch(`http://localhost:3001/search?q=${query}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log('Search results:', data); 
+          console.log('Search results:', data);
+          setResults(data);
         })
         .catch((error) => console.error('Error fetching search results:', error));
     }

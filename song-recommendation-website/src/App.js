@@ -10,7 +10,7 @@ import PlaylistRecommendationPage from './components/PlaylistRecommendationPage'
 import UserProfilePage from './components/UserProfilePage';
 import FavoritesPage from './components/FavoritesPage';
 import Register from './components/Register';
-import SearchResultsPage from './components/SearchResultsPage'; 
+import SearchResultsPage from './components/SearchResultsPage'; // Import the SearchResultsPage
 
 const App = () => {
   return (
@@ -27,7 +27,7 @@ const App = () => {
           <Route path="/user-profile" element={<UserProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/search" element={<SearchResultsPage />} /> {/**/}
+          <Route path="/search" element={<SearchResultsPage />} /> {/* Add this route */}
         </Routes>
       </div>
     </Router>
