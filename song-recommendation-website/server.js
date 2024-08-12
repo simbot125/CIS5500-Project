@@ -185,6 +185,42 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+app.get('/year/:year', (req, res) => {
+  const year = req.params.year;
+
+  const billboardQuery = 'SELECT * FROM billboard_data WHERE YEAR(date) = ?';
+  const spotifyQuery = 'SELECT * FROM spotify_data WHERE YEAR(track_album_release_date) = ?';
+
+  // Query both tables
+  connection.query(billboardQuery, [year], (billboardErr, billboardResults) => {
+    if (billboardErr) {
+      console.error('Error executing Billboard query:', billboardErr.stack);
+      return res.status(500).send('Error executing Billboard query');
+    }
+
+    connection.query(spotifyQuery, [year], (spotifyErr, spotifyResults) => {
+      if (spotifyErr) {
+        console.error('Error executing Spotify query:', spotifyErr.stack);
+        return res.status(500).send('Error executing Spotify query');
+      }
+
+      // Combine results (assuming you want to merge the first result from both tables)
+      const yearData = {
+        year: year,
+        most_popular_song: billboardResults[0]?.song || 'N/A',
+        most_popular_artist: billboardResults[0]?.artist || 'N/A',
+        valence: spotifyResults[0]?.valence || 'N/A',
+        tempo: spotifyResults[0]?.tempo || 'N/A',
+        key: spotifyResults[0]?.track_key || 'N/A',
+        danceability: spotifyResults[0]?.danceability || 'N/A',
+      };
+
+      res.json(yearData);
+    });
+  });
+});
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
